@@ -4,7 +4,7 @@ Stand: 18. Oktober 2026 · Vorabfassung `0.1.0-preview.1`.
 
 ## Tatsächliches lokales Ergebnis
 
-**100 Tests bestanden, 2 Tests ausdrücklich übersprungen.**
+**102 Tests bestanden, 2 Tests lokal ausdrücklich übersprungen.**
 
 Ausgeführt: `python -m pytest -q` im Repository.
 Umgebung: Python 3.13.5, PyYAML 6.0.3, Jinja2 3.1.6, pytest 9.0.2.
@@ -33,22 +33,29 @@ Er ersetzt weder die HA-Template-Engine vollständig noch Runtime, Eventloop,
 Cloud-API, Zeitmessung oder parallele Aufrufe. Die Tests beweisen insbesondere
 **keine reale globale Sperrwirkung** und keine tatsächliche Getränkeausgabe.
 
-## Noch nicht durchgeführt
+## CI-Ergebnis auf GitHub
 
-- Die zwei tatsächlichen HA-Schematests: lokal **übersprungen**, nicht bestanden.
+Am 18. Oktober 2026 liefen auf GitHub beide Jobs erfolgreich:
+
+- `static-and-simulated`: **102 bestanden**, Python 3.13.
+- `homeassistant-schema`: **2 bestanden** gegen echte Home-Assistant-2026.10.2-Schemas unter Python 3.14.
+
+Nachweis: [GitHub-Actions-Lauf 39162471240](https://github.com/masssi164/Home-Assistant-Blueprints/actions/runs/39162471240), Commit `365aca55d33f917d6fc465958bb287bada760ddf`.
+Die ursprünglichen CI-Läufe waren rot, weil die HA-Schematests erst einen echten HomeAssistant-Kontext im Eventloop benötigten. Dieser Testaufbau wurde korrigiert; die Skriptlogik musste nicht geändert werden.
+
+## Noch nicht durchgeführt
 - Import/Speichern der Vorabfassung in Home Assistant und reale Ausführung dort.
-- GitHub Actions einschließlich des vorbereiteten HA-Schemajobs.
 - Cloud-/Maschinenaufrufe, zeitliche Rennen und Sperrverhalten im HA-Eventloop.
 - Frontend-, VoiceOver-, HomeKit-, Zigbee- oder MCP-Abnahme.
 
 Das Home-Assistant-Paket konnte in der Arbeitsumgebung nicht nachinstalliert werden
 (Netzwerk-/Namensauflösung nicht verfügbar); außerdem ist dort Python 3.13.5 vorhanden,
 während der vorgesehene HA-Schemajob Python ab 3.14.2 benötigt.
-Die CI ist für echte **Home-Assistant-2026.10.2**-Schemas mit Python 3.14 vorbereitet.
-Dort ist ein fehlendes HA-Paket ein Fehler, kein still übersprungener Erfolg.
-Selbst ein später grüner Schemajob ersetzt keinen Geräte- und Interface-Test.
+Die CI hat die **Home-Assistant-2026.10.2**-Schemas mit Python 3.14
+tatsächlich erfolgreich geprüft. Der Schemajob prüft jedoch nicht die reale
+Geräteanbindung oder die Bedienung im Home-Assistant-Frontend.
 
 Die Version bleibt bis zur tatsächlichen Abnahme eine **Vorabfassung**, nicht ein
-bereits freigegebenes Release. Der aktuelle Stand wird auf GitHub als Preview bereitgestellt. Ob die dortige CI erfolgreich durchläuft, ist separat zu verifizieren.
+bereits freigegebenes Release. Der aktuelle Stand wird auf GitHub als Preview bereitgestellt. Die genannte CI-Ausführung war erfolgreich; spätere Commits benötigen eigene grüne CI-Läufe.
 
 [Abnahmeplan](acceptance.md) · [Quellen](sources.md)
