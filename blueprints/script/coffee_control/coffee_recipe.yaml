@@ -1,0 +1,106 @@
+# SPDX-License-Identifier: MIT
+blueprint:
+  name: Kaffee auf Zuruf – Favorit
+  description: |-
+    Ein benannter Favorit für Dashboard, Siri, Zigbee-Taster oder Automation.
+    Wähle die bereits konfigurierte Zentrale derselben Maschine, nicht einen anderen Favoriten.
+    Leere Rezeptwerte verwenden die Geräte-/Integrationsvorgaben, nicht automatisch die Dashboard-Einstellung.
+    Unterstützte Werte hängen von Maschine UND Getränk ab. Mengen niemals blind übernehmen.
+  domain: script
+  author: masssi164
+  homeassistant:
+    min_version: 2026.10.0
+  source_url: https://github.com/masssi164/Home-Assistant-Blueprints/blob/main/blueprints/script/coffee_control/coffee_recipe.yaml
+  input:
+    engine_script:
+      name: Kaffee-Zentrale
+      description: Das eine zentrale Skript für diese Maschine. Alle ihre Favoriten wählen dieselbe Zentrale.
+      selector:
+        entity:
+          filter:
+          - domain: script
+    beverage_type:
+      name: Getränk
+      default: Coffee
+      selector:
+        select:
+          options:
+          - label: Kaffee
+            value: Coffee
+          - label: Espresso
+            value: Espresso
+          - label: Cappuccino
+            value: Cappuccino
+          - label: Latte Macchiato
+            value: LatteMacchiato
+          - label: Heißwasser für Tee
+            value: HotWater
+    recipe:
+      name: Rezeptwerte (optional)
+      collapsed: true
+      input:
+        fill_quantity:
+          name: Füllmenge
+          description: 0 = keine Vorgabe. Sonst ganzzahlige ml; die Maschine kann je Getränk engere Grenzen
+            haben. Tasse passend wählen.
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 1000
+              step: 1
+              unit_of_measurement: ml
+              mode: box
+        bean_amount:
+          name: Bohnenstärke
+          description: Leer = keine Vorgabe. Sonst rohen Wert aus dem options-Attribut des Stärke-Selects kopieren
+            (EnumType.BeanAmount…). Nicht bei Heißwasser.
+          default: ''
+          selector:
+            text: {}
+        coffee_temperature:
+          name: Kaffeetemperatur
+          description: Leer = keine Vorgabe. Sonst rohen Wert aus dem options-Attribut des Temperatur-Selects
+            kopieren (EnumType.CoffeeTemperature…). Kein Grad-Celsius-Wert, nicht bei Heißwasser.
+          default: ''
+          selector:
+            text: {}
+alias: Kaffee auf Zuruf Favorit
+icon: mdi:coffee
+mode: single
+max_exceeded: warning
+sequence:
+- variables:
+    cfg_engine: !input 'engine_script'
+    cfg_beverage: !input 'beverage_type'
+    cfg_quantity: !input 'fill_quantity'
+    cfg_beans: !input 'bean_amount'
+    cfg_temperature: !input 'coffee_temperature'
+- if:
+  - condition: template
+    value_template: '{{ cfg_engine == this.entity_id or not has_value(cfg_engine) }}'
+  then:
+  - action: persistent_notification.create
+    data:
+      title: Kaffee auf Zuruf – abgebrochen
+      message: Als Zentrale ein vorhandenes zentrales Kaffee-Skript wählen, nicht diesen Favoriten.
+  - stop: Als Zentrale ein vorhandenes zentrales Kaffee-Skript wählen, nicht diesen Favoriten.
+    error: true
+- variables:
+    recipe_options: |-
+      {% set ns = namespace(items=[]) %}
+      {% if cfg_quantity != 0 %}
+        {% set ns.items = ns.items + [{'key': 'ConsumerProducts.CoffeeMaker.Option.FillQuantity', 'value': cfg_quantity}] %}
+      {% endif %}
+      {% if cfg_beans | trim %}
+        {% set ns.items = ns.items + [{'key': 'ConsumerProducts.CoffeeMaker.Option.BeanAmount', 'value': cfg_beans | trim}] %}
+      {% endif %}
+      {% if cfg_temperature | trim %}
+        {% set ns.items = ns.items + [{'key': 'ConsumerProducts.CoffeeMaker.Option.CoffeeTemperature', 'value': cfg_temperature | trim}] %}
+      {% endif %}
+      {{ ns.items }}
+- alias: Zentrale direkt aufrufen und Fehler weiterreichen
+  action: '{{ cfg_engine }}'
+  data:
+    beverage_type: '{{ cfg_beverage }}'
+    program_options: '{{ recipe_options }}'

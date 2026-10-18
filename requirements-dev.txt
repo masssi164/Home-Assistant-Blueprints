@@ -1,0 +1,4 @@
+# Development only; not needed to install the Home Assistant blueprints.
+PyYAML>=6.0.2,<7
+Jinja2>=3.1.6,<4
+pytest>=8.2,<10

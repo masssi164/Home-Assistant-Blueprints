@@ -1,0 +1,396 @@
+# SPDX-License-Identifier: MIT
+# Preview: vor einer öffentlichen Freigabe am echten Gerät abnehmen.
+blueprint:
+  name: Kaffee auf Zuruf – Zentrale
+  description: |-
+    Eine gemeinsame Zubereitungslogik pro Maschine, auf Basis von Home Connect Alt.
+    Wähle fünf Entitäten DERSELBEN Maschine. Die Geräte-ID wird daraus ermittelt.
+    Home Connect Alt muss den Übersetzungsmodus „Local“ verwenden.
+    Standard: Trockenlauf, kein automatisches Einschalten. Noch keine Hardware-Freigabe.
+    Einschalten kann eine Spülung auslösen. Tasse, Füllmenge und Milchausgabe selbst prüfen.
+    Alle Favoriten dieser Maschine müssen dieselbe Zentrale verwenden.
+    Dokumentation: https://github.com/masssi164/Home-Assistant-Blueprints/blob/main/docs/installation.md
+  domain: script
+  author: masssi164
+  homeassistant:
+    min_version: 2026.10.0
+  source_url: https://github.com/masssi164/Home-Assistant-Blueprints/blob/main/blueprints/script/coffee_control/prepare_coffee.yaml
+  input:
+    machine:
+      name: 1. Entitäten deiner Maschine
+      input:
+        connection_entity:
+          name: Verbindung
+          description: 'Connected: online = on. Nicht der globale Integrationsstatus.'
+          selector:
+            entity:
+              filter:
+              - domain: binary_sensor
+                integration: home_connect_alt
+        power_entity:
+          name: Ein-/Ausschalten
+          description: PowerState als select, nicht der gleichnamige Sensor.
+          selector:
+            entity:
+              filter:
+              - domain: select
+                integration: home_connect_alt
+        operation_entity:
+          name: Betriebszustand
+          description: 'OperationState: interner Zustand endet im Leerlauf auf .Ready.'
+          selector:
+            entity:
+              filter:
+              - domain: sensor
+                integration: home_connect_alt
+        remote_start_entity:
+          name: Fernstart erlaubt
+          description: 'RemoteControlStartAllowed: on = Fernstart erlaubt.'
+          selector:
+            entity:
+              filter:
+              - domain: binary_sensor
+                integration: home_connect_alt
+        local_control_entity:
+          name: Bedienung am Gerät aktiv
+          description: 'LocalControlActive: off = keine lokale Bedienung.'
+          selector:
+            entity:
+              filter:
+              - domain: binary_sensor
+                integration: home_connect_alt
+    behaviour:
+      name: 2. Test und Einschalten
+      input:
+        dry_run:
+          name: Trockenlauf – nichts an der Maschine verändern
+          description: Zum echten Test ausschalten. Im Trockenlauf werden nur Konfiguration/Zustände geprüft;
+            keine Cloud-Aktion und kein Funktionstest der Maschine.
+          default: true
+          selector:
+            boolean: {}
+        auto_power_on:
+          name: Automatisches Einschalten erlauben
+          description: 'Bewusst aktivieren: Eine automatische Spülung kann vor dem Getränk erfolgen.'
+          default: false
+          selector:
+            boolean: {}
+    timeouts:
+      name: 3. Zeitgrenzen (optional)
+      collapsed: true
+      input:
+        power_timeout:
+          name: Auf Einschalten warten
+          default: 30
+          selector:
+            number:
+              min: 1
+              max: 180
+              step: 1
+              unit_of_measurement: s
+              mode: box
+        ready_timeout:
+          name: Auf Bereitschaft warten
+          default: 90
+          selector:
+            number:
+              min: 1
+              max: 300
+              step: 1
+              unit_of_measurement: s
+              mode: box
+        start_timeout:
+          name: Auf Rückmeldung „Run“ warten
+          default: 30
+          selector:
+            number:
+              min: 1
+              max: 120
+              step: 1
+              unit_of_measurement: s
+              mode: box
+        finish_timeout:
+          name: Maximale Lauf-/Sperrzeit nach dem Start
+          default: 300
+          selector:
+            number:
+              min: 30
+              max: 900
+              step: 1
+              unit_of_measurement: s
+              mode: box
+alias: Kaffee auf Zuruf Zentrale
+icon: mdi:coffee-maker
+mode: single
+max_exceeded: warning
+fields:
+  beverage_type:
+    name: Getränk
+    description: Ein fehlender Wert wird zur Laufzeit als Coffee behandelt; unbekannte Werte werden abgewiesen.
+    default: Coffee
+    selector:
+      select:
+        options:
+        - label: Kaffee
+          value: Coffee
+        - label: Espresso
+          value: Espresso
+        - label: Cappuccino
+          value: Cappuccino
+        - label: Latte Macchiato
+          value: LatteMacchiato
+        - label: Heißwasser für Tee
+          value: HotWater
+  program_options:
+    name: Programmoptionen (optional)
+    description: Liste aus key/value-Paaren für BeanAmount, CoffeeTemperature und/oder FillQuantity. Leer =
+      keine ausdrücklichen Vorgaben; nicht automatisch die aktuellen Dashboard-Werte.
+    default: []
+    advanced: true
+    selector:
+      object: {}
+sequence:
+- alias: Konfiguration fest aus Blueprint übernehmen (nicht aus Aufrufdaten)
+  variables:
+    cfg_connection: !input 'connection_entity'
+    cfg_power: !input 'power_entity'
+    cfg_operation: !input 'operation_entity'
+    cfg_remote: !input 'remote_start_entity'
+    cfg_local: !input 'local_control_entity'
+    cfg_dry_run: !input 'dry_run'
+    cfg_auto_power: !input 'auto_power_on'
+    cfg_power_timeout: !input 'power_timeout'
+    cfg_ready_timeout: !input 'ready_timeout'
+    cfg_start_timeout: !input 'start_timeout'
+    cfg_finish_timeout: !input 'finish_timeout'
+    cfg_allowed:
+    - Coffee
+    - Espresso
+    - Cappuccino
+    - LatteMacchiato
+    - HotWater
+    cfg_on: BSH.Common.EnumType.PowerState.On
+    cfg_ready: BSH.Common.EnumType.OperationState.Ready
+    cfg_run: BSH.Common.EnumType.OperationState.Run
+- variables:
+    requested_beverage: '{{ beverage_type | default(''Coffee'') }}'
+    requested_options_type_valid: '{{ program_options is not defined or (program_options is sequence and program_options
+      is not string and program_options is not mapping) }}'
+    requested_options: '{{ program_options | default([]) }}'
+    cfg_device: '{{ device_id(cfg_connection) }}'
+    cfg_entities: '{{ [cfg_connection, cfg_power, cfg_operation, cfg_remote, cfg_local] }}'
+- variables:
+    input_error: |-
+      {% set ns = namespace(error='', seen=[]) %}
+      {% if requested_beverage not in cfg_allowed %}
+        {% set ns.error = 'Unbekanntes Getränk. Erlaubt: Coffee, Espresso, Cappuccino, LatteMacchiato, HotWater.' %}
+      {% elif not requested_options_type_valid or requested_options is not sequence or requested_options is string or requested_options is mapping %}
+        {% set ns.error = 'program_options muss eine Liste von key/value-Paaren sein.' %}
+      {% else %}
+        {% for option in requested_options %}
+          {% if not ns.error %}
+            {% if option is not mapping or 'key' not in option or 'value' not in option or option | length != 2 %}
+              {% set ns.error = 'Jede Programmoption braucht genau key und value.' %}
+            {% elif option.key not in ['ConsumerProducts.CoffeeMaker.Option.BeanAmount', 'ConsumerProducts.CoffeeMaker.Option.CoffeeTemperature', 'ConsumerProducts.CoffeeMaker.Option.FillQuantity'] %}
+              {% set ns.error = 'Diese Programmoption wird von dieser Version nicht unterstützt.' %}
+            {% elif option.key in ns.seen %}
+              {% set ns.error = 'Eine Programmoption wurde doppelt übergeben.' %}
+            {% elif option.key == 'ConsumerProducts.CoffeeMaker.Option.FillQuantity' %}
+              {% if option.value is not number or option.value is boolean or option.value <= 0 or option.value > 1000 or option.value | int != option.value %}
+                {% set ns.error = 'Füllmenge muss eine ganze Zahl von 1 bis 1000 ml sein; die Maschine kann einen engeren Bereich verlangen.' %}
+              {% endif %}
+            {% elif requested_beverage == 'HotWater' %}
+              {% set ns.error = 'Für HotWater unterstützt diese Version nur FillQuantity, keine Kaffee-Stärke oder Kaffee-Temperatur.' %}
+            {% elif option.value is not string %}
+              {% set ns.error = 'Stärke und Temperatur müssen die rohen Home-Connect-Enumwerte als Text sein.' %}
+            {% elif option.key == 'ConsumerProducts.CoffeeMaker.Option.BeanAmount' and not option.value.startswith('ConsumerProducts.CoffeeMaker.EnumType.BeanAmount.') %}
+              {% set ns.error = 'Bohnenstärke: rohen Enumwert aus den Entwicklerwerkzeugen übernehmen.' %}
+            {% elif option.key == 'ConsumerProducts.CoffeeMaker.Option.CoffeeTemperature' and not option.value.startswith('ConsumerProducts.CoffeeMaker.EnumType.CoffeeTemperature.') %}
+              {% set ns.error = 'Temperatur: rohen Enumwert aus den Entwicklerwerkzeugen übernehmen.' %}
+            {% endif %}
+            {% if option is mapping and 'key' in option %}{% set ns.seen = ns.seen + [option.key] %}{% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {{ ns.error }}
+- alias: Aufrufparameter prüfen
+  if:
+  - condition: template
+    value_template: '{{ input_error | trim != '''' }}'
+  then:
+  - action: persistent_notification.create
+    data:
+      title: Kaffee auf Zuruf – abgebrochen
+      message: '{{ input_error | trim }}'
+  - stop: '{{ input_error | trim }}'
+    error: true
+- variables:
+    normalized_options: |-
+      {% set ns = namespace(items=[]) %}
+      {% for option in requested_options %}
+        {% set value = option.value | int if option.key == 'ConsumerProducts.CoffeeMaker.Option.FillQuantity' else option.value %}
+        {% set ns.items = ns.items + [{'key': option.key, 'value': value}] %}
+      {% endfor %}
+      {{ ns.items }}
+- variables:
+    configuration_error: |-
+      {% set ns = namespace(error='') %}
+      {% if not cfg_device %}
+        {% set ns.error = 'Der Verbindungssensor ist keinem Gerät zugeordnet. Home-Connect-Alt-Entität auswählen.' %}
+      {% endif %}
+      {% for e in cfg_entities %}
+        {% if not ns.error and device_id(e) != cfg_device %}
+          {% set ns.error = 'Alle fünf Entitäten müssen zum selben Gerät gehören. Prüfe: ' ~ e %}
+        {% elif not ns.error and not has_value(e) %}
+          {% set ns.error = 'Entität fehlt, ist unknown oder unavailable: ' ~ e %}
+        {% endif %}
+      {% endfor %}
+      {% if not ns.error %}
+        {% if not is_state(cfg_connection, 'on') %}
+          {% set ns.error = 'Maschine ist nicht mit Home Connect verbunden.' %}
+        {% elif states(cfg_remote) not in ['on', 'off'] or states(cfg_local) not in ['on', 'off'] %}
+          {% set ns.error = 'Fernstart- und lokale Bedienungsentität müssen binäre on/off-Zustände liefern.' %}
+        {% elif not states(cfg_power).startswith('BSH.Common.EnumType.PowerState.') or not states(cfg_operation).startswith('BSH.Common.EnumType.OperationState.') %}
+          {% set ns.error = 'Rohe Enumwerte fehlen. In Home Connect Alt den Übersetzungsmodus Local einstellen.' %}
+        {% elif is_state(cfg_local, 'on') %}
+          {% set ns.error = 'Die Maschine wird gerade lokal bedient. Kein Fernstart.' %}
+        {% elif states(cfg_operation) in ['BSH.Common.EnumType.OperationState.Run', 'BSH.Common.EnumType.OperationState.Pause', 'BSH.Common.EnumType.OperationState.DelayedStart'] %}
+          {% set ns.error = 'Die Maschine ist bereits beschäftigt. Es wird kein weiterer Kaffee vorgemerkt.' %}
+        {% elif not is_state(cfg_power, cfg_on) and not cfg_auto_power %}
+          {% set ns.error = 'Maschine ist aus. Bitte selbst einschalten oder automatisches Einschalten bewusst erlauben.' %}
+        {% elif not is_state(cfg_power, cfg_on) and cfg_on not in (state_attr(cfg_power, 'options') or []) %}
+          {% set ns.error = 'Die gewählte Power-Entität bietet den rohen On-Wert nicht an.' %}
+        {% endif %}
+      {% endif %}
+      {{ ns.error }}
+    cfg_program_key: '{{ ''ConsumerProducts.CoffeeMaker.Program.Beverage.'' ~ requested_beverage }}'
+- alias: Gerätezuordnung und Ausgangszustand prüfen
+  if:
+  - condition: template
+    value_template: '{{ configuration_error | trim != '''' }}'
+  then:
+  - action: persistent_notification.create
+    data:
+      title: Kaffee auf Zuruf – abgebrochen
+      message: '{{ configuration_error | trim }}'
+  - stop: '{{ configuration_error | trim }}'
+    error: true
+- alias: Trockenlauf endet vor jeder Geräteaktion
+  if:
+  - condition: template
+    value_template: '{{ cfg_dry_run }}'
+  then:
+  - action: persistent_notification.create
+    data:
+      title: Kaffee auf Zuruf – Trockenlauf
+      message: |-
+        Keine Maschine geschaltet und kein Programm gestartet.
+        Geplant: {{ requested_beverage }}.
+        Optionen: {{ requested_options }}.
+        Aktueller Fernstart: {{ states(cfg_remote) }}, Betrieb: {{ states(cfg_operation) }}.
+        Das prüft Konfiguration und gelesene Zustände, nicht Geräte-/Programmkompatibilität.
+        Für den beaufsichtigten Gerätetest den Trockenlauf in der Zentrale ausschalten.
+  - variables:
+      coffee_result: '{{ {''status'': ''dry_run'', ''beverage_type'': requested_beverage} }}'
+  - stop: Trockenlauf beendet.
+    response_variable: coffee_result
+- alias: Bei Bedarf einschalten
+  if:
+  - condition: template
+    value_template: '{{ not is_state(cfg_power, cfg_on) }}'
+  then:
+  - action: select.select_option
+    target:
+      entity_id: '{{ cfg_power }}'
+    data:
+      option: '{{ cfg_on }}'
+  - wait_template: '{{ is_state(cfg_power, cfg_on) or not is_state(cfg_connection, ''on'') }}'
+    timeout:
+      seconds: '{{ cfg_power_timeout }}'
+    continue_on_timeout: true
+  - if:
+    - condition: template
+      value_template: '{{ not wait.completed or not is_state(cfg_power, cfg_on) or not is_state(cfg_connection,
+        ''on'') }}'
+    then:
+    - action: persistent_notification.create
+      data:
+        title: Kaffee auf Zuruf – abgebrochen
+        message: Einschalten nicht bestätigt oder Verbindung verloren. Kein Programm gestartet.
+    - stop: Einschalten nicht bestätigt oder Verbindung verloren. Kein Programm gestartet.
+      error: true
+- alias: Begrenzt auf Fernstartbereitschaft warten
+  wait_template: '{{ not is_state(cfg_connection, ''on'') or is_state(cfg_local, ''on'') or states(cfg_operation)
+    in [''BSH.Common.EnumType.OperationState.Run'', ''BSH.Common.EnumType.OperationState.Pause'', ''BSH.Common.EnumType.OperationState.DelayedStart'']
+    or (is_state(cfg_power, cfg_on) and is_state(cfg_remote, ''on'') and is_state(cfg_local, ''off'') and is_state(cfg_operation,
+    cfg_ready)) }}'
+  timeout:
+    seconds: '{{ cfg_ready_timeout }}'
+  continue_on_timeout: true
+- alias: Unmittelbar vor dem Start erneut prüfen
+  if:
+  - condition: template
+    value_template: '{{ not wait.completed or not (is_state(cfg_connection, ''on'') and is_state(cfg_power,
+      cfg_on) and is_state(cfg_remote, ''on'') and is_state(cfg_local, ''off'') and is_state(cfg_operation,
+      cfg_ready)) }}'
+  then:
+  - action: persistent_notification.create
+    data:
+      title: Kaffee auf Zuruf – abgebrochen
+      message: 'Maschine nicht rechtzeitig startbereit: Verbindung, Fernstart, lokale Bedienung, Ready und
+        ggf. Pflegehinweis prüfen. Kein Programm gestartet.'
+  - stop: 'Maschine nicht rechtzeitig startbereit: Verbindung, Fernstart, lokale Bedienung, Ready und ggf.
+      Pflegehinweis prüfen. Kein Programm gestartet.'
+    error: true
+- alias: Genau eine Startanfrage – kein automatischer Wiederholungsversuch
+  action: home_connect_alt.start_program
+  data:
+    device_id: '{{ cfg_device }}'
+    program_key: '{{ cfg_program_key }}'
+    validate: true
+    options: '{{ normalized_options }}'
+- alias: Start anhand des Betriebszustands beobachten
+  wait_template: '{{ is_state(cfg_operation, cfg_run) or not is_state(cfg_connection, ''on'') }}'
+  timeout:
+    seconds: '{{ cfg_start_timeout }}'
+  continue_on_timeout: true
+- alias: Bei unklarer Rückmeldung vor Wiederholungen warnen und Sperre halten
+  if:
+  - condition: template
+    value_template: '{{ not wait.completed or not (is_state(cfg_operation, cfg_run) and is_state(cfg_connection,
+      ''on'')) }}'
+  then:
+  - action: persistent_notification.create
+    data:
+      title: Kaffee auf Zuruf – Start unklar
+      message: |-
+        Eine Startanfrage wurde gesendet, aber Run nicht zuverlässig beobachtet.
+        Nicht erneut starten; zuerst Maschine und Skript-Trace prüfen.
+        Die Zentrale hält für {{ cfg_finish_timeout }} Sekunden die lokale Skriptsperre.
+        Keine automatische Wiederholung und keine Aussage, ob bereits Kaffee ausgegeben wurde.
+  - delay:
+      seconds: '{{ cfg_finish_timeout }}'
+  - stop: Startstatus unklar. Keine Wiederholung durchgeführt. Maschine vor erneutem Start prüfen.
+    error: true
+- alias: Gemeinsame single-Sperre bis zum beobachteten Laufende halten
+  wait_template: '{{ is_state(cfg_operation, cfg_ready) or not is_state(cfg_connection, ''on'') }}'
+  timeout:
+    seconds: '{{ cfg_finish_timeout }}'
+  continue_on_timeout: true
+- if:
+  - condition: template
+    value_template: '{{ not wait.completed or not (is_state(cfg_operation, cfg_ready) and is_state(cfg_connection,
+      ''on'')) }}'
+  then:
+  - action: persistent_notification.create
+    data:
+      title: Kaffee auf Zuruf – abgebrochen
+      message: Laufende nicht bestätigt oder Verbindung verloren. Keine Wiederholung; Maschine vor dem nächsten
+        Aufruf prüfen.
+  - stop: Laufende nicht bestätigt oder Verbindung verloren. Keine Wiederholung; Maschine vor dem nächsten
+      Aufruf prüfen.
+    error: true
+- variables:
+    coffee_result: '{{ {''status'': ''cycle_observed'', ''beverage_type'': requested_beverage} }}'
+- stop: Betriebszustand wechselte von Run zurück zu Ready.
+  response_variable: coffee_result

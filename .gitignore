@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+local/
+.env
+.env.*
+*.log
+*.zip
+scripts.yaml
+kaffee.yaml
+.DS_Store
+secrets.yaml
+configuration.yaml
+known_devices.yaml
+.storage/
+*.db
+*.db-shm
+*.db-wal
+
+# Separate, prefilled user-specific configuration must not be published.
+*.private.yaml
+*.private.json

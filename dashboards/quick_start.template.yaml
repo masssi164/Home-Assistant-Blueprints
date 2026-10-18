@@ -1,0 +1,81 @@
+# Nicht unverändert importieren: IDs mit tools/render_dashboard.py ersetzen.
+title: Kaffee auf Zuruf
+views:
+- title: Kaffee
+  path: kaffee
+  icon: mdi:coffee-maker
+  cards:
+  - type: markdown
+    content: |-
+      # Kaffee auf Zuruf
+      Sprache statt Touch – oder einfach dein Lieblingsgetränk auswählen.
+
+      Vor dem Start: passendes Gefäß und sicheren Ablauf einschließlich möglicher Spülung prüfen.
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+    - type: button
+      entity: __COFFEE_SCRIPT__
+      name: Kaffee
+      icon: mdi:coffee
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: __COFFEE_SCRIPT__
+      hold_action:
+        action: more-info
+    - type: button
+      entity: __ESPRESSO_SCRIPT__
+      name: Espresso
+      icon: mdi:coffee-outline
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: __ESPRESSO_SCRIPT__
+      hold_action:
+        action: more-info
+    - type: button
+      entity: __CAPPUCCINO_SCRIPT__
+      name: Cappuccino
+      icon: mdi:coffee-to-go
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: __CAPPUCCINO_SCRIPT__
+      hold_action:
+        action: more-info
+    - type: button
+      entity: __LATTE_SCRIPT__
+      name: Latte Macchiato
+      icon: mdi:glass-mug-variant
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: __LATTE_SCRIPT__
+      hold_action:
+        action: more-info
+    - type: button
+      entity: __TEA_SCRIPT__
+      name: Heißwasser für Tee
+      icon: mdi:tea
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: __TEA_SCRIPT__
+      hold_action:
+        action: more-info
+  - type: markdown
+    content: Diese Tasten starten deine Favoriten. Rezeptwerte änderst du beim jeweiligen Favorit-Skript unter
+      Einstellungen → Automatisierungen & Szenen → Skripte. Das Abschalten eines Skripts ist **kein** Stoppbefehl
+      für die Kaffeemaschine.

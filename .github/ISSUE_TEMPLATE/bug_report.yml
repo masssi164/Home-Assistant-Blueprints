@@ -1,0 +1,33 @@
+name: Fehler melden
+description: Anonymisierte Angaben zu einem nachvollziehbaren Fehler
+title: '[Fehler] '
+body:
+  - type: markdown
+    attributes:
+      value: Keine Zugangsdaten, Geräte-IDs oder vollständigen privaten HA-Exporte anhängen.
+  - type: input
+    id: versions
+    attributes:
+      label: Versionen
+      description: Projektstand, Home Assistant und Home Connect Alt
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Modell
+      description: Modellbezeichnung ohne individuelle Seriennummer
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Ablauf, Erwartung und tatsächliches Ergebnis
+      description: Getränk, optional gesetzte Rezeptwerte, Trockenlauf an/aus und Fehlertext
+    validations:
+      required: true
+  - type: textarea
+    id: trace
+    attributes:
+      label: Anonymisierter Trace-Ausschnitt
+      description: Persönliche Entity-Präfixe, Geräte-IDs, Tokens und sonstige private Daten entfernen.

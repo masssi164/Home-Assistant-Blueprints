@@ -1,0 +1,82 @@
+# Startdashboard: nur eingebaute Karten.
+# Die fünf Beispiel-Skript-IDs ggf. im visuellen Karteneditor durch deine Favoriten ersetzen.
+title: Kaffee auf Zuruf
+views:
+- cards:
+  - content: |-
+      # Kaffee auf Zuruf
+      Sprache statt Touch – oder einfach dein Lieblingsgetränk auswählen.
+
+      Vor dem Start: passendes Gefäß und sicheren Ablauf einschließlich möglicher Spülung prüfen.
+    type: markdown
+  - cards:
+    - entity: script.kaffee_auf_zuruf_kaffee
+      hold_action:
+        action: more-info
+      icon: mdi:coffee
+      name: Kaffee
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: script.kaffee_auf_zuruf_kaffee
+      type: button
+    - entity: script.kaffee_auf_zuruf_espresso
+      hold_action:
+        action: more-info
+      icon: mdi:coffee-outline
+      name: Espresso
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: script.kaffee_auf_zuruf_espresso
+      type: button
+    - entity: script.kaffee_auf_zuruf_cappuccino
+      hold_action:
+        action: more-info
+      icon: mdi:coffee-to-go
+      name: Cappuccino
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: script.kaffee_auf_zuruf_cappuccino
+      type: button
+    - entity: script.kaffee_auf_zuruf_latte_macchiato
+      hold_action:
+        action: more-info
+      icon: mdi:glass-mug-variant
+      name: Latte Macchiato
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: script.kaffee_auf_zuruf_latte_macchiato
+      type: button
+    - entity: script.kaffee_auf_zuruf_tee
+      hold_action:
+        action: more-info
+      icon: mdi:tea
+      name: Heißwasser für Tee
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: script.turn_on
+        target:
+          entity_id: script.kaffee_auf_zuruf_tee
+      type: button
+    columns: 2
+    square: false
+    type: grid
+  - content: Diese Tasten starten deine Favoriten. Rezeptwerte änderst du beim jeweiligen Favorit-Skript unter
+      Einstellungen → Automatisierungen & Szenen → Skripte. Das Abschalten eines Skripts ist **kein** Stoppbefehl
+      für die Kaffeemaschine.
+    type: markdown
+  icon: mdi:coffee-maker
+  path: kaffee
+  title: Kaffee

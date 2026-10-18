@@ -1,0 +1,20 @@
+{
+  "COFFEE_SCRIPT": "script.kaffee_auf_zuruf_kaffee",
+  "ESPRESSO_SCRIPT": "script.kaffee_auf_zuruf_espresso",
+  "CAPPUCCINO_SCRIPT": "script.kaffee_auf_zuruf_cappuccino",
+  "LATTE_SCRIPT": "script.kaffee_auf_zuruf_latte_macchiato",
+  "TEA_SCRIPT": "script.kaffee_auf_zuruf_tee",
+  "POWER_ENTITY": "select.meine_kaffeemaschine_bsh_common_setting_powerstate",
+  "OPERATION_ENTITY": "sensor.meine_kaffeemaschine_bsh_common_status_operationstate",
+  "CONNECTED_ENTITY": "binary_sensor.meine_kaffeemaschine_connected",
+  "REMOTE_ENTITY": "binary_sensor.meine_kaffeemaschine_bsh_common_status_remotecontrolstartallowed",
+  "CHILD_LOCK_ENTITY": "binary_sensor.meine_kaffeemaschine_bsh_common_setting_childlock",
+  "TEMPERATURE_ENTITY": "select.meine_kaffeemaschine_consumerproducts_coffeemaker_option_coffeetemperature",
+  "BEANS_ENTITY": "select.meine_kaffeemaschine_consumerproducts_coffeemaker_option_beanamount",
+  "QUANTITY_ENTITY": "number.meine_kaffeemaschine_consumerproducts_coffeemaker_option_fillquantity",
+  "MULTIPLE_ENTITY": "switch.meine_kaffeemaschine_consumerproducts_coffeemaker_option_multiplebeverages",
+  "MILK_COUNTER_ENTITY": "sensor.meine_kaffeemaschine_consumerproducts_coffeemaker_status_beveragecountercoffeeandmilk",
+  "COFFEE_COUNTER_ENTITY": "sensor.meine_kaffeemaschine_consumerproducts_coffeemaker_status_beveragecountercoffee",
+  "ESPRESSO_COUNTER_ENTITY": "sensor.meine_kaffeemaschine_consumerproducts_coffeemaker_status_beveragecounterristrettoespresso",
+  "WATER_COUNTER_ENTITY": "sensor.meine_kaffeemaschine_consumerproducts_coffeemaker_status_beveragecounterhotwater"
+}

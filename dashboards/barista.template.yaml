@@ -1,0 +1,341 @@
+# Bereinigte Weiterentwicklung des vom Autor bereitgestellten Barista-Dashboards.
+# Benötigt Mushroom mit Legacy Template Card; zuerst alle Tokens mit dem Renderer ersetzen.
+views:
+- title: Barista
+  path: barista
+  icon: mdi:coffee-maker
+  type: sections
+  max_columns: 4
+  dense_section_placement: true
+  badges:
+  - entity: __OPERATION_ENTITY__
+  - entity: __POWER_ENTITY__
+  sections:
+  - type: grid
+    column_span: 4
+    cards:
+    - type: custom:mushroom-title-card
+      title: Kaffee auf Zuruf – Barista
+      subtitle: Deine persönliche Kaffee-Zentrale
+    - type: markdown
+      content: '**Direktsteuerung:** Einschalten/Standby und die unteren Geräteoptionen verändern die Maschine
+        direkt – auch wenn die Kaffee-Zentrale im Trockenlauf steht. Beim Einschalten kann eine Spülung erfolgen.'
+    - type: horizontal-stack
+      cards:
+      - type: custom:mushroom-legacy-template-card
+        entity: __POWER_ENTITY__
+        primary: '{{ ''BEREIT ☕'' if is_state(''__POWER_ENTITY__'', ''BSH.Common.EnumType.PowerState.On'')
+          else ''EINSCHALTEN'' }}'
+        secondary: '{{ states(''__POWER_ENTITY__'').replace(''BSH.Common.EnumType.PowerState.'', '''') }}'
+        icon: |-
+          {% if is_state('__POWER_ENTITY__', 'BSH.Common.EnumType.PowerState.On') %}
+            mdi:coffee-maker
+          {% else %}
+            mdi:power
+          {% endif %}
+        icon_color: |-
+          {% if is_state('__POWER_ENTITY__', 'BSH.Common.EnumType.PowerState.On') %}
+            green
+          {% else %}
+            red
+          {% endif %}
+        badge_icon: |-
+          {% if is_state('__POWER_ENTITY__', 'BSH.Common.EnumType.PowerState.On') %}
+            mdi:check-circle
+          {% else %}
+            mdi:power-sleep
+          {% endif %}
+        badge_color: |-
+          {% if is_state('__POWER_ENTITY__', 'BSH.Common.EnumType.PowerState.On') %}
+            green
+          {% else %}
+            red
+          {% endif %}
+        layout: vertical
+        tap_action:
+          action: call-service
+          service: select.select_option
+          service_data:
+            entity_id: __POWER_ENTITY__
+            option: BSH.Common.EnumType.PowerState.On
+        hold_action:
+          action: more-info
+        double_tap_action:
+          action: more-info
+      - type: custom:mushroom-legacy-template-card
+        entity: __OPERATION_ENTITY__
+        primary: Status
+        secondary: '{% set state = states(''__OPERATION_ENTITY__'') %} {% if ''Ready'' in state %} Bereit ✓
+          {% elif ''Run'' in state %} Läuft ☕ {% elif ''Inactive'' in state %} Inaktiv {% else %} {{ state.replace(''BSH.Common.EnumType.OperationState.'',
+          '''') }} {% endif %}'
+        icon: '{% set state = states(''__OPERATION_ENTITY__'') %} {% if ''Ready'' in state %} mdi:check-circle-outline
+          {% elif ''Run'' in state %} mdi:coffee-maker {% else %} mdi:sleep {% endif %}'
+        icon_color: '{% set state = states(''__OPERATION_ENTITY__'') %} {% if ''Ready'' in state %} green {%
+          elif ''Run'' in state %} amber {% else %} grey {% endif %}'
+        layout: vertical
+        tap_action:
+          action: more-info
+      - type: custom:mushroom-legacy-template-card
+        entity: __POWER_ENTITY__
+        primary: Standby
+        secondary: Maschine ausschalten
+        icon: mdi:power-sleep
+        icon_color: grey
+        tap_action:
+          action: call-service
+          service: select.select_option
+          service_data:
+            entity_id: __POWER_ENTITY__
+            option: BSH.Common.EnumType.PowerState.Standby
+  - type: grid
+    column_span: 4
+    cards:
+    - type: custom:mushroom-title-card
+      title: ⚡ Quick-Start Programme
+      subtitle: Ein Tap zum perfekten Kaffee
+    - type: grid
+      columns: 4
+      square: false
+      cards:
+      - type: custom:mushroom-legacy-template-card
+        primary: Cappuccino
+        secondary: Klassiker
+        icon: mdi:coffee-outline
+        icon_color: brown
+        badge_icon: mdi:star
+        badge_color: yellow
+        layout: vertical
+        tap_action:
+          action: call-service
+          service: __CAPPUCCINO_SCRIPT__
+        hold_action:
+          action: none
+        double_tap_action:
+          action: more-info
+          entity: __CAPPUCCINO_SCRIPT__
+      - type: custom:mushroom-legacy-template-card
+        primary: Espresso
+        secondary: Stark & Kurz
+        icon: mdi:coffee-to-go
+        icon_color: red
+        badge_icon: mdi:lightning-bolt
+        badge_color: red
+        layout: vertical
+        tap_action:
+          action: call-service
+          service: __ESPRESSO_SCRIPT__
+        hold_action:
+          action: none
+        double_tap_action:
+          action: more-info
+          entity: __ESPRESSO_SCRIPT__
+      - type: custom:mushroom-legacy-template-card
+        primary: Kaffee
+        secondary: Crema
+        icon: mdi:coffee
+        icon_color: deep-orange
+        badge_icon: mdi:cup
+        badge_color: orange
+        layout: vertical
+        tap_action:
+          action: call-service
+          service: __COFFEE_SCRIPT__
+        hold_action:
+          action: none
+        double_tap_action:
+          action: more-info
+          entity: __COFFEE_SCRIPT__
+      - type: custom:mushroom-legacy-template-card
+        primary: Latte Macchiato
+        secondary: Cremig
+        icon: mdi:glass-mug-variant
+        icon_color: amber
+        badge_icon: mdi:heart
+        badge_color: pink
+        layout: vertical
+        tap_action:
+          action: call-service
+          service: __LATTE_SCRIPT__
+        hold_action:
+          action: none
+        double_tap_action:
+          action: more-info
+          entity: __LATTE_SCRIPT__
+    - type: custom:mushroom-legacy-template-card
+      primary: ℹ️ Bedienung
+      secondary: Einmal auslösen = Favorit starten. Rezeptwerte im Favorit-Skript einstellen, nicht hier aus
+        dem aktuellen Programm ableiten.
+      icon: mdi:information
+      icon_color: blue
+      multiline_secondary: true
+      layout: horizontal
+  - type: grid
+    column_span: 2
+    cards:
+    - type: custom:mushroom-title-card
+      title: ⚙️ Barista-Einstellungen
+      subtitle: Perfektioniere deinen Kaffee
+    - type: markdown
+      content: '**Optionen des aktuell ausgewählten/aktiven Programms.** Diese direkten Regler sind keine gespeicherten
+        Rezepte. Favoriten senden nur die im Favorit-Skript ausdrücklich konfigurierten Werte. Ein Programmwechsel
+        kann andere Werte oder Grenzen haben.'
+    - type: custom:mushroom-entity-card
+      entity: __TEMPERATURE_ENTITY__
+      name: Temperatur
+      icon: mdi:thermometer
+      icon_color: red
+      primary_info: name
+      secondary_info: state
+      tap_action:
+        action: more-info
+    - type: custom:mushroom-entity-card
+      entity: __BEANS_ENTITY__
+      name: Bohnenstärke
+      icon: mdi:coffee-maker
+      icon_color: brown
+      primary_info: name
+      secondary_info: state
+      tap_action:
+        action: more-info
+    - type: custom:mushroom-number-card
+      entity: __QUANTITY_ENTITY__
+      name: Füllmenge
+      icon: mdi:cup-water
+      icon_color: blue
+      display_mode: buttons
+      primary_info: name
+      secondary_info: state
+    - type: custom:mushroom-entity-card
+      entity: __MULTIPLE_ENTITY__
+      name: Mehrfach-Getränk
+      icon: mdi:coffee-outline
+      icon_color: amber
+      primary_info: name
+      secondary_info: state
+      tap_action:
+        action: toggle
+  - type: grid
+    column_span: 4
+    cards:
+    - type: custom:mushroom-title-card
+      title: 📊 Deine Kaffee-Geschichte
+      subtitle: Was du schon alles gezaubert hast
+    - type: grid
+      columns: 4
+      square: false
+      cards:
+      - type: custom:mushroom-legacy-template-card
+        primary: Kaffee + Milch
+        secondary: '{{ states(''__MILK_COUNTER_ENTITY__'') }} Tassen'
+        icon: mdi:coffee-outline
+        icon_color: brown
+        badge_icon: mdi:crown
+        badge_color: yellow
+        layout: vertical
+        tap_action:
+          action: none
+      - type: custom:mushroom-legacy-template-card
+        primary: Schwarzer Kaffee
+        secondary: '{{ states(''__COFFEE_COUNTER_ENTITY__'') }} Tassen'
+        icon: mdi:coffee
+        icon_color: deep-orange
+        layout: vertical
+        tap_action:
+          action: none
+      - type: custom:mushroom-legacy-template-card
+        primary: Espresso
+        secondary: '{{ states(''__ESPRESSO_COUNTER_ENTITY__'') }} Shots'
+        icon: mdi:coffee-to-go
+        icon_color: red
+        layout: vertical
+        tap_action:
+          action: none
+      - type: custom:mushroom-legacy-template-card
+        primary: Heißwasser-Zähler
+        secondary: '{{ states(''__WATER_COUNTER_ENTITY__'') }} (Rohwert)'
+        icon: mdi:water-boiler
+        icon_color: cyan
+        layout: vertical
+        tap_action:
+          action: none
+    - type: custom:mushroom-legacy-template-card
+      primary: 🏆 Dein Lieblings-Getränk
+      secondary: |-
+        {% set milk = states('__MILK_COUNTER_ENTITY__') | int(-1) %}
+        {% set black = states('__COFFEE_COUNTER_ENTITY__') | int(-1) %}
+        {% set espresso = states('__ESPRESSO_COUNTER_ENTITY__') | int(-1) %}
+        {% if [milk, black, espresso] | min < 0 %}
+          Zähler noch nicht verfügbar
+        {% elif milk + black + espresso == 0 %}
+          Noch keine Getränke gezählt
+        {% else %}
+          {% set highest = [milk, black, espresso] | max %}
+          {% set ns = namespace(names=[]) %}
+          {% if milk == highest %}{% set ns.names = ns.names + ['Kaffee mit Milch'] %}{% endif %}
+          {% if black == highest %}{% set ns.names = ns.names + ['Schwarzer Kaffee'] %}{% endif %}
+          {% if espresso == highest %}{% set ns.names = ns.names + ['Espresso/Ristretto'] %}{% endif %}
+          {{ 'Gleichstand: ' if ns.names | length > 1 else '' }}{{ ns.names | join(', ') }} ({{ highest }})
+        {% endif %}
+      icon: mdi:trophy
+      icon_color: amber
+      layout: horizontal
+    - type: custom:mushroom-legacy-template-card
+      primary: 📈 Gesamt-Statistik
+      secondary: |-
+        {% set milk = states('__MILK_COUNTER_ENTITY__') | int(-1) %}
+        {% set black = states('__COFFEE_COUNTER_ENTITY__') | int(-1) %}
+        {% set espresso = states('__ESPRESSO_COUNTER_ENTITY__') | int(-1) %}
+        {% if [milk, black, espresso] | min < 0 %}
+          Zähler noch nicht verfügbar
+        {% else %}
+          {{ milk + black + espresso }} Bezüge in diesen drei Kategorien (Heißwasser nicht enthalten)
+        {% endif %}
+      icon: mdi:chart-line
+      icon_color: green
+      multiline_secondary: true
+      layout: horizontal
+  - type: grid
+    column_span: 2
+    cards:
+    - type: custom:mushroom-title-card
+      title: 🛠️ System & Wartung
+      subtitle: Alles im grünen Bereich
+    - type: custom:mushroom-entity-card
+      entity: __CONNECTED_ENTITY__
+      name: Verbindung
+      icon: mdi:wifi
+      icon_color: blue
+      primary_info: name
+      secondary_info: state
+    - type: custom:mushroom-entity-card
+      entity: __REMOTE_ENTITY__
+      name: Remote-Start
+      icon: mdi:remote
+      icon_color: blue
+      primary_info: name
+      secondary_info: state
+    - type: custom:mushroom-entity-card
+      entity: __CHILD_LOCK_ENTITY__
+      name: Kindersicherung
+      icon: mdi:lock
+      icon_color: blue
+      primary_info: name
+      secondary_info: state
+      tap_action:
+        action: more-info
+    - type: custom:mushroom-legacy-template-card
+      primary: Sprache statt Touch
+      secondary: Dieselben Favoriten lassen sich über Dashboard, Sprachsteuerung, Taster oder eine passende
+        Automation aufrufen.
+      icon: mdi:lightbulb-on
+      icon_color: yellow
+      multiline_secondary: true
+      layout: horizontal
+    - type: custom:mushroom-legacy-template-card
+      primary: Hinweis zur Statistik
+      secondary: Die Zähler stammen aus der Integration. Daraus werden weder Liter Heißwasser noch Kilogramm
+        Bohnen geschätzt.
+      icon: mdi:party-popper
+      icon_color: pink
+      multiline_secondary: true
+      layout: horizontal

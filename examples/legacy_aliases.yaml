@@ -1,0 +1,42 @@
+# Beispiel zum ERSETZEN einzelner alter Einträge, nicht blind anhängen.
+# Ziel-Skript-ID prüfen. Erst nach Abnahme; siehe docs/migration.md.
+mach_kaffee:
+  alias: Mach Kaffee
+  icon: mdi:coffee
+  mode: single
+  sequence:
+  - action: script.kaffee_auf_zuruf_zentrale
+    data:
+      beverage_type: Coffee
+mach_espresso:
+  alias: Mach Espresso
+  icon: mdi:coffee-outline
+  mode: single
+  sequence:
+  - action: script.kaffee_auf_zuruf_zentrale
+    data:
+      beverage_type: Espresso
+mach_cappuccino:
+  alias: Mach Cappuccino
+  icon: mdi:coffee-to-go
+  mode: single
+  sequence:
+  - action: script.kaffee_auf_zuruf_zentrale
+    data:
+      beverage_type: Cappuccino
+mach_latte_macchiato:
+  alias: Mach Latte Macchiato
+  icon: mdi:coffee-maker
+  mode: single
+  sequence:
+  - action: script.kaffee_auf_zuruf_zentrale
+    data:
+      beverage_type: LatteMacchiato
+mach_tee:
+  alias: Mach Tee
+  icon: mdi:tea
+  mode: single
+  sequence:
+  - action: script.kaffee_auf_zuruf_zentrale
+    data:
+      beverage_type: HotWater
