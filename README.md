@@ -8,19 +8,19 @@ Automationen bedienen. Das Interface ist austauschbar; die Geräteanbindung blei
 von der Home-Connect-Cloud abhängig. Die Hersteller-App wird damit nicht als
 unzugänglich dargestellt.
 
-**Status: Praxiseinsatz beim Autor bestätigt; weiterhin Vorabfassung.** Die Blueprints
-sind in der Home-Assistant-Installation des Autors eingerichtet; laut Rückmeldung
-funktioniert die bisherige Kaffee-Steuerung weiterhin. Zusätzlich wurde die Logik
-mit YAML-/Template-Tests und simulierten Zuständen geprüft. Ein vollständiger,
-dokumentierter End-to-End-Test sämtlicher Blueprint-Abläufe und eine Freigabe für
-andere Gerätemodelle stehen noch aus. [Prüfstand](docs/validation.md) · [Abnahme](docs/acceptance.md)
+**Status: Erfolgreicher Praxistest beim Autor; gerätespezifische Freigabe.** Die
+Blueprints sind in der Home-Assistant-Installation des Autors eingerichtet und
+die Kaffeezubereitung wurde nach dessen ausdrücklicher Bestätigung erfolgreich
+über die neuen Blueprint-Skripte getestet. Zusätzlich wurde die Logik mit
+YAML-/Template-Tests und simulierten Zuständen geprüft. Eine übertragbare
+Freigabe für andere Gerätemodelle ist damit nicht verbunden. [Prüfstand](docs/validation.md) · [Abnahme](docs/acceptance.md)
 
 [CI: Validate coffee blueprints](https://github.com/masssi164/Home-Assistant-Blueprints/actions/workflows/validate.yml)
 
 Die Ausgangskonfiguration stammt von einem **Siemens TP516DX3** (Modellbezeichnung
 in den bereitgestellten Entity-IDs). Das ist keine Zusage für sämtliche
-Home-Connect-Maschinen. Der gemeldete Praxiseinsatz ersetzt keine dokumentierte
-Hardware-Abnahme aller Blueprint-Funktionen.
+Home-Connect-Maschinen. Der bestätigte Praxistest belegt die Kaffeezubereitung über die neuen Blueprints
+auf dem Gerät des Autors, aber nicht jede Funktion oder andere Gerätemodelle.
 
 ## Für den ersten Kaffee
 
@@ -65,10 +65,10 @@ verwendet werden:
 - [Zentrale importieren](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmasssi164%2FHome-Assistant-Blueprints%2Fblob%2Fmain%2Fblueprints%2Fscript%2Fcoffee_control%2Fprepare_coffee.yaml)
 - [Favorit importieren](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmasssi164%2FHome-Assistant-Blueprints%2Fblob%2Fmain%2Fblueprints%2Fscript%2Fcoffee_control%2Fcoffee_recipe.yaml)
 
-**Die Blueprints sind beim Autor eingerichtet; die bestehende Steuerung funktioniert
-laut Rückmeldung weiterhin.** Die öffentliche Fassung bleibt bis zur dokumentierten
-End-to-End-Abnahme eine Vorabversion. Die Links zu `main` können sich ändern;
-eine stabile Release-Verknüpfung folgt nach der Abnahme.
+**Die Kaffeezubereitung über die neuen Blueprint-Skripte wurde beim Autor am
+realen Gerät erfolgreich getestet.** Weitere Gerätemodelle und sämtliche
+Sonderfälle sind nicht dadurch abgedeckt. Die Links zu `main` können sich ändern;
+eine stabile Release-Verknüpfung ist noch nicht vorhanden.
 
 ## Was getrennt bleibt
 
