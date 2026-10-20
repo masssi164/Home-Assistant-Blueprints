@@ -3,6 +3,7 @@ blueprint:
   name: Kaffee auf Zuruf – Favorit
   description: |-
     Ein benannter Favorit für Dashboard, Siri, Zigbee-Taster oder Automation.
+    Öffentliche Beta v1.0.0-beta.1.
     Wähle die bereits konfigurierte Zentrale derselben Maschine, nicht einen anderen Favoriten.
     Leere Rezeptwerte verwenden die Geräte-/Integrationsvorgaben, nicht automatisch die Dashboard-Einstellung.
     Unterstützte Werte hängen von Maschine UND Getränk ab. Mengen niemals blind übernehmen.
@@ -10,7 +11,7 @@ blueprint:
   author: masssi164
   homeassistant:
     min_version: 2026.10.0
-  source_url: https://github.com/masssi164/Home-Assistant-Blueprints/blob/main/blueprints/script/coffee_control/coffee_recipe.yaml
+  source_url: https://github.com/masssi164/Home-Assistant-Blueprints/blob/v1.0.0-beta.1/blueprints/script/coffee_control/coffee_recipe.yaml
   input:
     engine_script:
       name: Kaffee-Zentrale

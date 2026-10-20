@@ -1,20 +1,20 @@
 # SPDX-License-Identifier: MIT
-# Preview: vor einer öffentlichen Freigabe am echten Gerät abnehmen.
+# Öffentliche Beta v1.0.0-beta.1; End-to-End mit Siemens TP516DX3 getestet.
 blueprint:
   name: Kaffee auf Zuruf – Zentrale
   description: |-
     Eine gemeinsame Zubereitungslogik pro Maschine, auf Basis von Home Connect Alt.
     Wähle fünf Entitäten DERSELBEN Maschine. Die Geräte-ID wird daraus ermittelt.
     Home Connect Alt muss den Übersetzungsmodus „Local“ verwenden.
-    Standard: Trockenlauf, kein automatisches Einschalten. Noch keine Hardware-Freigabe.
+    Öffentliche Beta v1.0.0-beta.1. Standard: Trockenlauf, kein automatisches Einschalten.
     Einschalten kann eine Spülung auslösen. Tasse, Füllmenge und Milchausgabe selbst prüfen.
     Alle Favoriten dieser Maschine müssen dieselbe Zentrale verwenden.
-    Dokumentation: https://github.com/masssi164/Home-Assistant-Blueprints/blob/main/docs/installation.md
+    Dokumentation: https://github.com/masssi164/Home-Assistant-Blueprints/blob/v1.0.0-beta.1/docs/installation.md
   domain: script
   author: masssi164
   homeassistant:
     min_version: 2026.10.0
-  source_url: https://github.com/masssi164/Home-Assistant-Blueprints/blob/main/blueprints/script/coffee_control/prepare_coffee.yaml
+  source_url: https://github.com/masssi164/Home-Assistant-Blueprints/blob/v1.0.0-beta.1/blueprints/script/coffee_control/prepare_coffee.yaml
   input:
     machine:
       name: 1. Entitäten deiner Maschine

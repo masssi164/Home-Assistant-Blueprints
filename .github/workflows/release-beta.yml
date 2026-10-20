@@ -77,13 +77,12 @@ jobs:
           fi
           notes="releases/$tag.md"
           test -s "$notes"
-          export RELEASE_TAG="$tag"
-          existing="$(gh api --paginate "repos/$GH_REPO/releases" --jq '.[] | select(.tag_name == env.RELEASE_TAG) | .html_url')"
+          existing="$(gh api --paginate "repos/$GH_REPO/releases" --jq ".[] | select(.tag_name == \"$tag\") | .html_url")"
           if [[ -n "$existing" ]]; then
             echo "Release already exists and was left unchanged: $existing"
             exit 0
           fi
-          ref_sha="$(gh api "repos/$GH_REPO/git/matching-refs/tags/$tag" --jq '.[] | select(.ref == ("refs/tags/" + env.RELEASE_TAG)) | .object.sha')"
+          ref_sha="$(gh api "repos/$GH_REPO/git/matching-refs/tags/$tag" --jq ".[] | select(.ref == \"refs/tags/$tag\") | .object.sha")"
           if [[ -n "$ref_sha" && "$ref_sha" != "$GITHUB_SHA" ]]; then
             echo 'Existing tag differs from the validated commit; refusing to move it.' >&2
             exit 1

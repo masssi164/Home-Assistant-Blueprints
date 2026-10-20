@@ -1,61 +1,56 @@
-# Prüfstand der Vorabfassung
+# Teststand
 
-Stand: 18. Oktober 2026 · Vorabfassung `0.1.0-preview.1`.
+## Öffentliche Beta v1.0.0-beta.1
 
-## Tatsächliches lokales Ergebnis
+Der End-to-End-Ablauf der neuen Blueprint-Skripte wurde in Home Assistant mit einem
+**Siemens TP516DX3** erfolgreich getestet: Einrichtung der Blueprints, Konfiguration
+der Zentrale und Favoriten sowie reale Kaffeezubereitung über die Home-Connect-Anbindung.
+Die bestehende Kaffee-Steuerung funktioniert nach der Umstellung weiterhin.
 
-**102 Tests bestanden, 2 Tests lokal ausdrücklich übersprungen.**
+Dieser Gerätetest gilt für die getestete Installation. Weitere Modelle, Programme
+und Rezeptkombinationen werden mit ihrem jeweiligen Testumfang ergänzt; die Beta
+behauptet keine universelle Gerätekompatibilität.
 
-Ausgeführt: `python -m pytest -q` im Repository.
-Umgebung: Python 3.13.5, PyYAML 6.0.3, Jinja2 3.1.6, pytest 9.0.2.
-Zusätzlich: Python-Dateien kompilierbar. Das ehemalige Skript zur erstmaligen Repository-Erstellung entfällt; die GitHub-Publikation erfolgt separat.
+## Automatisierte Prüfungen
 
-Der abschließende Quellvergleich hat keine individuellen Gerätekennungen aus den
-beiden bereitgestellten Originaldateien im öffentlichen Dateisatz gefunden.
-Die separate private Vorkonfiguration gehört nicht zum Repository/ZIP.
+Die Tests lesen die ausgelieferten YAML-Dateien. Geprüft werden unter anderem
+YAML/JSON, doppelte Schlüssel, Blueprint-Inputs, Jinja-Syntax, Laufzeit-Defaults,
+Typen, erlaubte Optionen, Gerätezuordnung, Trockenlauf, Einschalten, Verbindung,
+Fernstartfreigabe, lokale Bedienung, Zustände und simulierte Fehler-/Wartepfade.
+Hinzu kommen Rezeptweitergabe, Dashboard-Mapping und Statistikfälle,
+Dokumentationslinks und Datenschutzheuristiken.
 
-## Umfang der bestandenen Tests
+Die Simulationsumgebung ersetzt nicht die reale Home-Assistant-Laufzeit,
+Cloud-API oder Geräteausgabe. Deshalb werden automatisierte Prüfungen und reale
+Gerätetests getrennt dokumentiert.
 
-Die Tests lesen die tatsächlich ausgelieferten YAML-Dateien. Geprüft werden:
-YAML/JSON und doppelte Schlüssel; Auflösen aller Blueprint-Inputs; Jinja-Syntax;
-Laufzeit-Defaults und Typen; erlaubte Getränke/Optionen; Gerätezuordnung;
-Trockenlauf; Einschalten; Verbindung, Remote-Freigabe, lokale Bedienung und
-Betriebszustände; simulierte Wartezeit-/Fehlerpfade; genau eine Startanfrage;
-Rezeptweitergabe; Dashboard-Mapping, Statistikfälle, interne Dokumentationslinks
-und eine Datenschutzheuristik. Auch spät eintreffende Zustände nach abgelaufener
-Wartezeit werden nicht als erfolgreicher Abschluss gewertet.
+### Nachweis vor der Beta-Veröffentlichung
 
-Beim Testen wurden ein Problem mit der Typprüfung vor der nativen Jinja-Konvertierung
-sowie die Ganzzahl-Normalisierung der Füllmenge erkannt und korrigiert.
+[Actions-Lauf 39375079858](https://github.com/masssi164/Home-Assistant-Blueprints/actions/runs/39375079858)
+für Commit `805f17cfb3b4353149abebc3d0e8d8dab204448a` wurde erfolgreich abgeschlossen.
 
-Die Zustandsabläufe verwenden einen kleinen expliziten **Test-Doppelgänger**.
-Er ersetzt weder die HA-Template-Engine vollständig noch Runtime, Eventloop,
-Cloud-API, Zeitmessung oder parallele Aufrufe. Die Tests beweisen insbesondere
-**keine reale globale Sperrwirkung** und keine tatsächliche Getränkeausgabe.
+Historischer Teststand vom 18. Oktober 2026:
 
-## CI-Ergebnis auf GitHub
+- Statische/Simulationsprüfungen: 102 Tests bestanden mit Python 3.13.
+- Home-Assistant-Schemas: 2 Tests bestanden gegen 2026.10.2 mit Python 3.14.
 
-Am 18. Oktober 2026 liefen auf GitHub beide Jobs erfolgreich:
+[Historischer Actions-Lauf 39162471240](https://github.com/masssi164/Home-Assistant-Blueprints/actions/runs/39162471240).
 
-- `static-and-simulated`: **102 bestanden**, Python 3.13.
-- `homeassistant-schema`: **2 bestanden** gegen echte Home-Assistant-2026.10.2-Schemas unter Python 3.14.
+### Prüfung des Release-Commits
 
-Nachweis: [GitHub-Actions-Lauf 39162471240](https://github.com/masssi164/Home-Assistant-Blueprints/actions/runs/39162471240), Commit `365aca55d33f917d6fc465958bb287bada760ddf`.
-Die ursprünglichen CI-Läufe waren rot, weil die HA-Schematests erst einen echten HomeAssistant-Kontext im Eventloop benötigten. Dieser Testaufbau wurde korrigiert; die Skriptlogik musste nicht geändert werden.
+Der Workflow [Publish beta release](https://github.com/masssi164/Home-Assistant-Blueprints/actions/workflows/release-beta.yml)
+führt beide Prüfgruppen auf dem Release-Commit aus und veröffentlicht nur, wenn
+beide erfolgreich sind. Die zugehörigen Actions-Protokolle enthalten die Ergebnisse
+und Testzahlen des konkreten Release-Stands.
 
-## Noch nicht durchgeführt
-- Import/Speichern der Vorabfassung in Home Assistant und reale Ausführung dort.
-- Cloud-/Maschinenaufrufe, zeitliche Rennen und Sperrverhalten im HA-Eventloop.
-- Frontend-, VoiceOver-, HomeKit-, Zigbee- oder MCP-Abnahme.
+Die Änderungen für die Beta betreffen Dokumentation, Versions-/Quellverweise und
+Veröffentlichung. Die Zubereitungslogik und ihre Standardwerte bleiben unverändert.
 
-Das Home-Assistant-Paket konnte in der Arbeitsumgebung nicht nachinstalliert werden
-(Netzwerk-/Namensauflösung nicht verfügbar); außerdem ist dort Python 3.13.5 vorhanden,
-während der vorgesehene HA-Schemajob Python ab 3.14.2 benötigt.
-Die CI hat die **Home-Assistant-2026.10.2**-Schemas mit Python 3.14
-tatsächlich erfolgreich geprüft. Der Schemajob prüft jedoch nicht die reale
-Geräteanbindung oder die Bedienung im Home-Assistant-Frontend.
+## Weitere Gerätetests
 
-Die Version bleibt bis zur tatsächlichen Abnahme eine **Vorabfassung**, nicht ein
-bereits freigegebenes Release. Der aktuelle Stand wird auf GitHub als Preview bereitgestellt. Die genannte CI-Ausführung war erfolgreich; spätere Commits benötigen eigene grüne CI-Läufe.
+Für zusätzliche Modelle und Interfaces die [Testcheckliste](acceptance.md) verwenden.
+Versionsnummern, Firmwarestände oder einzelne Rezeptgrenzen nur eintragen, wenn sie
+für den jeweiligen Test tatsächlich bekannt sind. Fehlerpfade während heißer
+Getränkeausgabe nicht durch riskante Manipulation erzwingen.
 
-[Abnahmeplan](acceptance.md) · [Quellen](sources.md)
+[Quellen](sources.md)
