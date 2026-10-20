@@ -8,16 +8,19 @@ Automationen bedienen. Das Interface ist austauschbar; die Geräteanbindung blei
 von der Home-Connect-Cloud abhängig. Die Hersteller-App wird damit nicht als
 unzugänglich dargestellt.
 
-**Status: Vorabfassung, noch keine Hardware-Freigabe.** Die Logik wurde lokal mit
-YAML-/Template-Tests und simulierten Zuständen geprüft. Ein Import in Home Assistant,
-das echte Cloud-Verhalten, die Darstellung und die Bedienung am Gerät sind noch
-abzunehmen. [Prüfstand](docs/validation.md) · [Abnahme](docs/acceptance.md)
+**Status: Praxiseinsatz beim Autor bestätigt; weiterhin Vorabfassung.** Die Blueprints
+sind in der Home-Assistant-Installation des Autors eingerichtet; laut Rückmeldung
+funktioniert die bisherige Kaffee-Steuerung weiterhin. Zusätzlich wurde die Logik
+mit YAML-/Template-Tests und simulierten Zuständen geprüft. Ein vollständiger,
+dokumentierter End-to-End-Test sämtlicher Blueprint-Abläufe und eine Freigabe für
+andere Gerätemodelle stehen noch aus. [Prüfstand](docs/validation.md) · [Abnahme](docs/acceptance.md)
 
 [CI: Validate coffee blueprints](https://github.com/masssi164/Home-Assistant-Blueprints/actions/workflows/validate.yml)
 
 Die Ausgangskonfiguration stammt von einem **Siemens TP516DX3** (Modellbezeichnung
 in den bereitgestellten Entity-IDs). Das ist keine Zusage für sämtliche
-Home-Connect-Maschinen und kein neuer Hardware-Test dieser Vorabfassung.
+Home-Connect-Maschinen. Der gemeldete Praxiseinsatz ersetzt keine dokumentierte
+Hardware-Abnahme aller Blueprint-Funktionen.
 
 ## Für den ersten Kaffee
 
@@ -62,9 +65,10 @@ verwendet werden:
 - [Zentrale importieren](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmasssi164%2FHome-Assistant-Blueprints%2Fblob%2Fmain%2Fblueprints%2Fscript%2Fcoffee_control%2Fprepare_coffee.yaml)
 - [Favorit importieren](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmasssi164%2FHome-Assistant-Blueprints%2Fblob%2Fmain%2Fblueprints%2Fscript%2Fcoffee_control%2Fcoffee_recipe.yaml)
 
-**Das Repository ist öffentlich, aber die Blueprints befinden sich noch in der Vorabprüfung.**
-Die Links zu `main` sind Entwicklungsversionen und können sich ändern.
-Eine stabile Release-Verknüpfung folgt erst nach der Hardware-Abnahme.
+**Die Blueprints sind beim Autor eingerichtet; die bestehende Steuerung funktioniert
+laut Rückmeldung weiterhin.** Die öffentliche Fassung bleibt bis zur dokumentierten
+End-to-End-Abnahme eine Vorabversion. Die Links zu `main` können sich ändern;
+eine stabile Release-Verknüpfung folgt nach der Abnahme.
 
 ## Was getrennt bleibt
 
