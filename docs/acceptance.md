@@ -1,55 +1,53 @@
-# Abnahme vor dem ersten öffentlichen Release
+# Gerätetests und Kompatibilität
 
-**Noch offen.** Eine grüne lokale Simulation ist keine Erlaubnis, diese Liste als
-erledigt zu markieren. Nur tatsächliche Beobachtungen eintragen.
+## Getesteter Stand
 
-## Testumgebung dokumentieren
+**v1.0.0-beta.1: End-to-End-Ablauf mit Siemens TP516DX3 erfolgreich getestet.**
+Die Blueprints sind in Home Assistant eingerichtet; Kaffee wird über die neuen
+Zentralen- und Favoriten-Skripte am realen Gerät zubereitet.
 
-- Datum, Home-Assistant-Version und Home-Connect-Alt-Version.
-- Modellbezeichnung/E-Nummer ohne individuelle Seriennummer, Firmware soweit bekannt.
-- Local-Übersetzungsmodus, tatsächlich vorhandene fünf Pflichtentitäten.
-- Für UI-Abnahme Browser/App, Mushroom-Version und verwendetes Hilfsmittel.
+Die folgende Checkliste dient weiteren Gerätemodellen, neuen Funktionen und
+Regressionstests. Ihre leeren Kästchen sind eine wiederverwendbare Testvorlage,
+keine Rücknahme des bereits erfolgten End-to-End-Tests.
 
-## Ablauf
+## Testumgebung
 
-- [ ] Beide unveränderten Blueprints lassen sich in Home Assistant importieren.
-- [ ] Eine Zentrale lässt sich mit den fünf korrekten Entitäten speichern.
-- [ ] Ein fehlendes/anderes Gerät und unknown/unavailable führen zu verständlichem Abbruch.
-- [ ] Favorit ohne Rezeptwerte läuft im Trockenlauf ohne Geräteaktion.
-- [ ] Gewünschte Änderung an einem Favoriten bleibt getrennt vom Blueprint.
-- [ ] Maschine von Hand eingeschaltet, sicher vorbereitet: ein Kaffee startet genau einmal.
-- [ ] Run und nachfolgend Ready werden erkannt; Trace entspricht dem Ablauf.
-- [ ] Zweiter Favorit während laufender Zentrale startet keine weitere Zubereitung.
-- [ ] Bereits laufendes Getränk bei neuem Aufruf wird nicht als Warteschlange behandelt.
-- [ ] Deaktivierter Fernstart / aktive lokale Bedienung / Pflegehinweis verhindern Start.
-- [ ] Bewusst freigegebenes Einschalten funktioniert unter Berücksichtigung der Spülung.
-- [ ] Je tatsächlich unterstütztem Getränk: Standard und ausdrücklich gewählte Werte prüfen.
-- [ ] Kaffee-/Espresso-/Milchmengen entsprechen den gewählten, angebotenen Werten.
-- [ ] Heißwasser separat prüfen; nicht unterstützte Getränke entfernen/dokumentieren.
-- [ ] Ein Optionswechsel auf ein anderes Programm erzeugt keine irreführende Rezeptzusage.
-- [ ] Native Dashboard-Tasten, Namen, Fokus und Screenreader-Ausgabe geprüft.
-- [ ] Optionale Barista-Karten nur bei vorhandenen Entitäten und passender Mushroom-Version geprüft.
-- [ ] HomeKit/Zigbee-Aufruf separat geprüft, falls als funktionierend beworben.
-- [ ] Keine Zugangsdaten oder persönlichen Kennungen im veröffentlichten Inhalt.
-- [ ] GitHub Actions einschließlich tatsächlichem HA-Schemajob erfolgreich.
+Datum, Blueprint-Version/Commit, Home-Assistant- und Home-Connect-Alt-Version sowie
+Modell/E-Nummer und Firmware soweit bekannt festhalten. Keine Seriennummern oder
+persönlichen Gerätekennungen veröffentlichen. Für UI-Tests zusätzlich Browser/App,
+optionale Mushroom-Version und verwendete Bedienhilfen notieren.
 
-Fehlerpfade mit Cloud-Unterbrechung nicht durch riskantes Manipulieren während
-heißer Ausgabe erzwingen. Zum gezielten Fehler-/Race-Test eine geeignete Testumgebung
-verwenden. Bei echten Geräten hat die sichere Handhabung Vorrang.
+## Checkliste für weitere Tests
+
+- [ ] Beide Blueprints importieren und Zentrale mit fünf Entitäten derselben Maschine speichern.
+- [ ] Favorit anlegen; persönliche Rezeptwerte bleiben getrennt vom Blueprint.
+- [ ] Trockenlauf ohne Geräteaktion und beaufsichtigten realen Start prüfen.
+- [ ] Start, Run und anschließendes Ready im Trace mit dem Gerät abgleichen.
+- [ ] Zweiter Favorit während eines laufenden Zentralenskripts startet keine weitere Zubereitung.
+- [ ] Bereits laufendes Getränk, lokale Bedienung oder fehlende Fernstartfreigabe verhindern einen weiteren Start.
+- [ ] Fehlerhafte Gerätezuordnung und unknown/unavailable führen zu einem verständlichen Abbruch.
+- [ ] Optionales Einschalten mit der Spülung der Maschine sicher testen.
+- [ ] Jedes beworbene Getränk mit Standardwerten und den verwendeten Rezeptoptionen prüfen.
+- [ ] Füllmengen, Stärke und Temperaturgrenzen pro Getränk dokumentieren; Heißwasser separat prüfen.
+- [ ] Verwendete Dashboard-, Sprach- und Taster-Interfaces separat prüfen.
+- [ ] Home-Assistant-Schema- und Simulations-CI für den jeweiligen Stand erfolgreich.
+- [ ] Geteilte Traces und Testberichte enthalten keine Zugangsdaten oder privaten Kennungen.
+
+Fehlerpfade mit Cloud-Unterbrechung oder zeitlichen Rennen nur in einer geeigneten
+Testumgebung prüfen. Nicht während heißer Ausgabe riskant am Gerät manipulieren.
 
 ## Ergebnisvorlage
 
 ```text
 Version/Commit:
 Datum:
-HA / Home Connect Alt:
-Modell (ohne Seriennummer):
-Getestete Programme:
-Getestete Optionen/Grenzen:
+Home Assistant / Home Connect Alt:
+Modell und Firmware (ohne Seriennummer):
+Getestete Programme und Rezeptoptionen:
 Start / Run / Ready beobachtet:
-Interfaces geprüft:
-Noch offene Einschränkungen:
-Testergebnis und freigegebener Umfang:
+Verwendete Interfaces:
+Ergebnis und Einschränkungen:
 ```
 
-Erst daraus eine Kompatibilitätszusage für das tatsächlich getestete Modell ableiten.
+[Fehler oder Modellrückmeldung melden](https://github.com/masssi164/Home-Assistant-Blueprints/issues/new/choose) ·
+[Teststand](validation.md)

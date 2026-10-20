@@ -2,55 +2,55 @@
 
 ## Vertrag zwischen Logik und Konfiguration
 
-Die Zentrale besitzt stabile Blueprint-Input-Namen für fünf Entitäten, Test-/Power-
-Verhalten und Zeitgrenzen. Der Aufrufvertrag lautet `beverage_type` plus optional
-`program_options`. Ein Favorit speichert seine zentrale Script-Entity-ID und
-Rezeptwerte getrennt von der Logik. Eine zweite Maschine bekommt eine eigene Zentrale;
-mehrere Favoriten derselben Maschine dürfen nicht je eine eigene Zentrale erzeugen.
+Die Zentrale besitzt Blueprint-Inputs für fünf Entitäten, Test-/Einschaltverhalten
+und Zeitgrenzen. Der Aufrufvertrag lautet `beverage_type` plus optional
+`program_options`. Favoriten speichern Zentralenskript und Rezeptwerte getrennt
+von der Logik. Jede Maschine bekommt eine Zentrale; alle ihre Favoriten verwenden
+sie gemeinsam.
 
-Neue optionale Blueprint-Inputs erhalten Defaults. Bestehende Inputs und die fünf
-Programmbezeichner nicht ohne Migration umbenennen. Änderungen an Defaults können
-vorhandene Instanzen mit nicht ausdrücklich gesetzten Werten betreffen und gehören
-in das Changelog. Inkompatible Änderungen bekommen eine neue Hauptversion und eine
-Migration, erforderlichenfalls einen separaten Blueprint-Dateipfad.
+Neue optionale Inputs erhalten Defaults. Bestehende Inputs und Programmbezeichner
+nicht ohne Migration umbenennen. Änderungen an Defaults können vorhandene Instanzen
+betreffen und gehören ins Changelog. Inkompatible Änderungen benötigen eine
+Migrationsanleitung, nötigenfalls einen separaten Blueprint-Dateipfad.
+
+## Versionierte Imports
+
+Die Importlinks und `source_url`-Angaben für **v1.0.0-beta.1** zeigen auf den festen
+Versions-Tag. Sie folgen nicht automatisch den Änderungen von `main`. Ein erneuter
+Import derselben Quelle bleibt auf dieser Beta. Für eine neuere Beta bewusst die
+neue Version wählen und deren Release-Notizen lesen.
 
 ## Update auf einer Installation
 
 1. Home-Assistant-Backup und Kopie der verwendeten Blueprint-Version erstellen.
-2. Changelog/Abnahme des Updates lesen. Nie eine laufende Kaffee-Zentrale neu laden.
-3. Aktualisierung über dieselbe Blueprint-Datei bzw. denselben Importpfad durchführen.
-   Ein Wechsel zwischen lokalem `coffee_control/...`-Pfad und GitHub-Import kann einen
-   anderen lokalen Pfad erzeugen; dann Instanzen bewusst umhängen, nicht beide kopieren.
+2. Changelog und Teststand lesen. Nie eine laufende Kaffee-Zentrale neu laden.
+3. Neue Blueprint-Version unter dem bisherigen lokalen Blueprint-Dateipfad ersetzen
+   oder Skriptinstanzen bewusst auf den neuen Importpfad umstellen. Ein Wechsel
+   zwischen lokalem `coffee_control/...`-Pfad und GitHub-Import kann einen anderen
+   lokalen Pfad erzeugen. Nicht versehentlich zwei Zentralen parallel verwenden.
 4. Skripte neu laden, Inputs und Zuordnungen prüfen, Trockenlauf und einen sicheren
-   beaufsichtigten Funktionstest durchführen. Erst dann weitere Interfaces testen.
+   beaufsichtigten Funktionstest durchführen. Danach weitere Interfaces testen.
 
-Ein Blueprint-Update lässt die getrennt gespeicherten persönlichen Inputs nicht
-absichtlich verschwinden; eine inkompatible Änderung kann dennoch Skripte brechen.
-„Kontrolle übernehmen“ erzeugt eine unabhängige Kopie und beendet den normalen
-Blueprint-Updatepfad. Für Alltagsanpassungen stattdessen Favorit-Inputs benutzen.
+Persönliche Inputs bleiben außerhalb der Blueprint-Dateien gespeichert; eine
+inkompatible Änderung kann dennoch eine Migration erfordern. „Kontrolle übernehmen“
+erzeugt eine unabhängige Kopie statt einer weiter an den Blueprint gebundenen Instanz.
+Alltagsanpassungen deshalb über Favorit-Inputs vornehmen.
 
-## Freigabeprozess
+## Weitere Beta-Releases
 
-Diese Vorabfassung ist als **0.1.0-preview.1** bezeichnet, aber noch kein GitHub-Tag
-oder Release. Vorgesehen: Änderungen in einem Branch/PR → lokale Tests → GitHub CI
-mit HA-Schema → gerätebezogene Abnahme → Changelog → Tag/Release → Hauptvideo-Link.
+Änderungen in Branch/PR prüfen, den tatsächlichen Gerätetestumfang dokumentieren,
+`VERSION`, Release-Notizen und Versionslinks gemeinsam aktualisieren und nach `main`
+übernehmen. **Publish beta release** prüft den Commit erneut und veröffentlicht erst
+danach als Pre-Release. Vorhandene Tags und Releases bleiben unverändert.
 
-Nur tatsächlich absolvierte Tests in [validation.md](validation.md) und der
-[Abnahme](acceptance.md) als erfolgreich vermerken. Eine Versionsnummer allein ist
-keine Freigabe. Die erste öffentliche stabile Importverknüpfung soll auf den
-abgenommenen Tag zeigen, nicht blind auf die laufende Entwicklung in `main`.
-
-Releases tragen dokumentierte Home-Assistant-/Integration-Versionen, bestätigte
-Modelle/Getränke und bekannte Grenzen. Ein gemeldetes neues Modell wird erst nach
-den entsprechenden Beobachtungen als unterstützt geführt. Nicht bei jeder Meldung
-alle Defaults für bestehende Nutzer ändern.
+Die vollständige Anleitung und Fehlerbehandlung stehen in [PUBLISH.md](../PUBLISH.md).
+Eine stabile Version wird nicht automatisch aus einer Beta erzeugt.
 
 ## CI und Datenschutz
 
-Die vorbereiteten Workflows haben nur Lese-Berechtigungen. Sie sprechen keine
-Maschine an und benötigen keine Home-Connect-Zugangsdaten. Action-Versionen sind
-auf Commit-SHAs fixiert; Dependabot kann Updates vorschlagen. Es gibt keinen
-verdeckten Auto-Release und kein `pull_request_target` mit fremdem Code.
+Die Validierungsjobs haben nur Leserechte und sprechen keine Maschine an. Nur der
+Veröffentlichungsjob erhält `contents: write` für Tag und GitHub-Release; er läuft
+nicht für Pull Requests oder Forks. Actions sind auf Commit-SHAs fixiert.
 
-Lokale Mapping-Dateien liegen in `local/` oder außerhalb des Repositorys. Vor jedem
-Push `git diff --cached` kontrollieren. Keine kompletten privaten HA-Exporte einchecken.
+Lokale Mapping-Dateien liegen in `local/` oder außerhalb des Repositorys. Keine
+privaten HA-Exporte, Zugangsdaten oder individuellen Gerätekennungen einchecken.
